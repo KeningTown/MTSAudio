@@ -1,6 +1,7 @@
 package com.example.mts_audio.common
 
 import android.util.Log
+import com.example.mts_audio.data.repository.LocalUserRepository
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -15,6 +16,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
 import javax.inject.Inject
+import com.example.mts_audio.data.model.Result
+import com.example.mts_audio.data.remote.auth.AuthApi
+import com.example.mts_audio.data.remote.auth.AuthResponse
 
 class AuthAuthenticator @Inject constructor(
     private val userRepository: LocalUserRepository
