@@ -52,7 +52,7 @@ class AuthAuthenticator @Inject constructor(
             .addInterceptor(loggingInterceptor)
             .build()
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://mooduck-service-api.onrender.com/api/")
+            .baseUrl("")
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .client(okHttpClient)

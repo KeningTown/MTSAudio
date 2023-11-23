@@ -69,7 +69,7 @@ class DataModule {
     @Provides
     fun provideRetrofitBuilder(): Retrofit.Builder =
         Retrofit.Builder()
-            .baseUrl("https://mooduck-service-api.onrender.com/api/")
+            .baseUrl("")
             .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .addConverterFactory(GsonConverterFactory.create())
 
