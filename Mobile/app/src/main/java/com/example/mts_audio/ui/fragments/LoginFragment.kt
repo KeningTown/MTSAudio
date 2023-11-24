@@ -81,7 +81,7 @@ class LoginFragment : Fragment() {
                         loginResult.success.user.id,
                         loginResult.toString(),
                         loginResult.success.accessToken,
-                        loginResult.success.refreshToken
+                        loginResult.success.refreshToken,
                     )
                 )
                 findNavController().navigate(R.id.action_loginFragment_to_mainFragment)
