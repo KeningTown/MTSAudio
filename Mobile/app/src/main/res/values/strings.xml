@@ -4,4 +4,11 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="invalid_username">Некоректная почта</string>
+    <string name="invalid_password">Некоректный пароль</string>
+    <string name="error_string">Ошибка авторизации</string>
+    <string name="welcome">Добро пожаловать</string>
+    <string name="login">Войти</string>
+    <string name="signup">Зарегистрироваться</string>
+    <string name="enter"></string>
 </resources>

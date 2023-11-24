@@ -8,7 +8,9 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.mts_audio.R
 import com.example.mts_audio.ui.viewmodels.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainFragment : Fragment() {
 
     companion object {
