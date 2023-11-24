@@ -3,8 +3,22 @@
     <style name="Base.Theme.MTSAudio" parent="Theme.Material3.Light.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+        <item name="textInputStyle">@style/Widget.App.TextInputLayout</item>
+
     </style>
 
     <style name="Theme.MTSAudio" parent="Base.Theme.MTSAudio" />
+
+    <style name="Widget.App.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="helperTextTextColor">@color/red</item>
+        <item name="boxStrokeErrorColor">@color/red</item>
+        <item name="errorTextColor">@color/red</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="hintTextColor">?attr/colorOnSurface</item>
+        <item name="boxStrokeColor">?attr/colorOnSurface</item>
+    </style>
+
+
 
 </resources>

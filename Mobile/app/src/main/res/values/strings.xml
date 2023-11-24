@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MTS-Audio</string>
+    <string name="app_name">MTS Audio</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <!-- TODO: Remove or change this placeholder text -->
@@ -10,5 +10,11 @@
     <string name="welcome">Добро пожаловать</string>
     <string name="login">Войти</string>
     <string name="signup">Зарегистрироваться</string>
-    <string name="enter"></string>
+    <string name="enter">Вход</string>
+    <string name="next">Далее</string>
+    <string name="user_name">Имя пользователя</string>
+    <string name="user_password">Пароль</string>
+    <string name="not_have_account">Еще нет аккаунта? </string>
+    <string name="you_enter">Вы входите в сервис МТС Music</string>
+    <string name="have_account">Уже есть аккаунт?</string>
 </resources>
