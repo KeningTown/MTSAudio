@@ -4,4 +4,7 @@
     <string name="invalid_password">Некоректный пароль</string>
     <string name="error_string">Ошибка авторизации</string>
     <string name="welcome">Добро пожаловать</string>
+    <string name="login">Войти</string>
+    <string name="signup">Зарегистрироваться</string>
+    <string name="enter"></string>
 </resources>
