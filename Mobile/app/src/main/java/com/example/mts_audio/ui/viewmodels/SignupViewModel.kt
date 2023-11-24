@@ -11,9 +11,10 @@ import com.example.mts_audio.data.remote.auth.AuthResult
 import com.example.mts_audio.data.repository.AuthRepository
 import com.example.mts_audio.ui.model.AuthFormState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 @HiltViewModel
-class SignupViewModel(
+class SignupViewModel @Inject constructor(
     private val authRepository: AuthRepository,
 ) : ViewModel() {
 
