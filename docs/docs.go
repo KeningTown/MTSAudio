@@ -56,7 +56,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/Account/RefreshToken": {
+        "/api/Account/RefreshTokens": {
             "get": {
                 "description": "Обновление токенов и получение access_token в JSON и refresh_token в cookie",
                 "produces": [
@@ -70,7 +70,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/httphandlers.RefreshToken.token"
+                            "$ref": "#/definitions/httphandlers.RefreshTokens.token"
                         }
                     },
                     "400": {
@@ -209,7 +209,7 @@ const docTemplate = `{
                 }
             }
         },
-        "httphandlers.RefreshToken.token": {
+        "httphandlers.RefreshTokens.token": {
             "type": "object",
             "properties": {
                 "access_token": {

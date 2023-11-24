@@ -9,7 +9,7 @@ definitions:
       username:
         type: string
     type: object
-  httphandlers.RefreshToken.token:
+  httphandlers.RefreshTokens.token:
     properties:
       access_token:
         type: string
@@ -80,7 +80,7 @@ paths:
       summary: Просмотр данных текущего аккаунта
       tags:
       - AccountController
-  /api/Account/RefreshToken:
+  /api/Account/RefreshTokens:
     get:
       description: Обновление токенов и получение access_token в JSON и refresh_token
         в cookie
@@ -90,7 +90,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/httphandlers.RefreshToken.token'
+            $ref: '#/definitions/httphandlers.RefreshTokens.token'
         "400":
           description: Bad Request
           schema:

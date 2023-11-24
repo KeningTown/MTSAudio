@@ -67,3 +67,8 @@ func (db Database) FindTokenById(tokenId int) models.Token {
 	db.db.Find(&token, "id = ?", tokenId)
 	return token
 }
+
+func (db Database) DeleteToken(token string) {
+	var tokenModel models.Token
+	db.db.Delete(&tokenModel, "token = ?", token)
+}

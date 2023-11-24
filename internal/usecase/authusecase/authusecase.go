@@ -13,6 +13,9 @@ type AuthRepository interface {
 	FindUserByUsername(username string) models.User
 	FindUserById(id uint) models.User
 	CreateUser(user models.User) models.User
+	CreateToken(token string, userId int) models.Token
+	FindTokenById(tokenId int) models.Token
+	DeleteToken(token string)
 }
 
 type AuthUsecase struct {
@@ -47,6 +50,8 @@ func (au AuthUsecase) SignIn(user entities.User) (entities.User, string, string,
 		return entities.User{}, "", "", err
 	}
 
+	au.r.CreateToken(refreshToken, int(userEntite.Id))
+
 	return dto.UserModelToEntitie(userModel), accessToken, refreshToken, nil
 }
 
@@ -64,6 +69,9 @@ func (au AuthUsecase) SignUp(user entities.User) (entities.User, string, string,
 	if err != nil {
 		return entities.User{}, "", "", err
 	}
+
+	au.r.CreateToken(refreshToken, int(userEntite.Id))
+
 	return userEntite, accesToken, refreshToken, nil
 }
 
@@ -71,7 +79,7 @@ func (au AuthUsecase) SignOut(token string) {
 	tokens.RemoveToken(token)
 }
 
-func (au AuthUsecase) RefreshTokens(accessToken, refreshToken string) (string, string, error) {
+func (au AuthUsecase) RefreshTokens(refreshToken string) (string, string, error) {
 	refreshTokenEntitie, err := tokens.ParseToken(refreshToken)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to parse refresh token: %w", err)
@@ -85,9 +93,12 @@ func (au AuthUsecase) RefreshTokens(accessToken, refreshToken string) (string, s
 	userEntite := dto.UserModelToEntitie(userModel)
 
 	accesToken, refreshToken, err := tokens.GenerateNewJwts(userEntite)
+
 	if err != nil {
 		return "", "", err
 	}
+
+	au.r.CreateToken(refreshToken, int(userEntite.Id))
 
 	return accesToken, refreshToken, nil
 }

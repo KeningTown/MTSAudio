@@ -1,6 +1,6 @@
-FROM golang
+FROM golang:latest
 
-WORKDIR /app/dbwriter
+WORKDIR /app
 
 COPY go.mod .
 COPY go.sum .

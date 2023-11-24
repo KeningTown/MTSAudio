@@ -14,7 +14,7 @@ type AuthUsecase interface {
 	SignIn(user entities.User) (entities.User, string, string, error)
 	SignUp(user entities.User) (entities.User, string, string, error)
 	SignOut(token string)
-	RefreshTokens(accessToken, refreshToken string) (string, string, error)
+	RefreshTokens(refreshToken string) (string, string, error)
 }
 
 type HTTPHandler struct {
@@ -69,24 +69,28 @@ func (hh HTTPHandler) UserSignIn(ctx *gin.Context) {
 // @Tags AccountController
 // @Description Обновление токенов и получение access_token в JSON и refresh_token в cookie
 // @Produce  json
-// @Success 201 {object} httphandlers.RefreshToken.token
+// @Success 201 {object} httphandlers.RefreshTokens.token
 // @Failure 400 {object} httputils.ResponseError
-// @Router /api/Account/RefreshToken [get]
-func (hh HTTPHandler) RefreshToken(ctx *gin.Context) {
-	accessToken := strings.Split(ctx.GetHeader("Authorization"), " ")[1]
+// @Failure 401 {object} httputils.ResponseError
+// @Router /api/Account/RefreshTokens [get]
+func (hh HTTPHandler) RefreshTokens(ctx *gin.Context) {
 	refreshToken, err := ctx.Cookie("refresh_token")
 	if err != nil {
 		httputils.NewResponseError(ctx, 400, "failed to get refresh token from cookie")
 	}
 
-	accessToken, refreshToken, err = hh.hu.RefreshTokens(accessToken, refreshToken)
+	accessToken, refreshToken, err := hh.hu.RefreshTokens(refreshToken)
+	if err != nil {
+		httputils.NewResponseError(ctx, 400, err.Error())
+		return
+	}
 
 	type token struct {
 		AccessToken string `json:"access_token"`
 	}
 
 	ctx.SetCookie("refresh_token", refreshToken, 2592000, "/", "localhost", false, true)
-	ctx.JSON(200, token{AccessToken: accessToken})
+	ctx.JSON(201, token{AccessToken: accessToken})
 }
 
 // @Summary Регистрация
@@ -143,6 +147,7 @@ func (hh HTTPHandler) UserSignUp(ctx *gin.Context) {
 func (hh HTTPHandler) UserSignOut(ctx *gin.Context) {
 	token := strings.Split(ctx.GetHeader("Authorization"), " ")[1]
 	hh.hu.SignOut(token)
+	ctx.SetCookie("refresh_token", "", 1, "/", "localhost", false, true)
 	ctx.Status(200)
 }
 

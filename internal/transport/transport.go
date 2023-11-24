@@ -38,7 +38,7 @@ func (s *Server) Run(ctx context.Context, huc httphandlers.AuthUsecase) {
 	s.router.POST("/api/Account/SignIn", httpHandler.UserSignIn)
 	s.router.POST("/api/Account/SignUp", httpHandler.UserSignUp)
 	authRouts.POST("/api/Account/SignOut", httpHandler.UserSignOut)
-	authRouts.GET("/api/Account/RefreshTokens", httpHandler.RefreshToken)
+	s.router.GET("/api/Account/RefreshTokens", httpHandler.RefreshTokens)
 	authRouts.GET("/api/Account/Me", httpHandler.UserMyAccount)
 
 	srv := http.Server{
