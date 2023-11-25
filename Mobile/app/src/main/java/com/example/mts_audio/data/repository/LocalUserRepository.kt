@@ -12,7 +12,6 @@ class LocalUserRepository @Inject constructor(
 ) {
 
     private val KEY_ACCESS_TOKEN = "access_token"
-    private val KEY_REFRESH_TOKEN = "refresh_token"
     private val KEY_USER_ID = "user_id"
 
     //TODO delete user password from sharedPreferences
@@ -26,11 +25,11 @@ class LocalUserRepository @Inject constructor(
     init {
         _userFlow.value = getUser()
     }
+
     fun saveUser(user: User) {
         with(editor) {
             putString(KEY_USER_ID, user.userid)
             putString(KEY_USER_PASSWORD, user.userPassword)
-            putString(KEY_REFRESH_TOKEN, user.refreshToken)
             putString(KEY_ACCESS_TOKEN, user.accessToken)
             apply()
         }
@@ -42,22 +41,19 @@ class LocalUserRepository @Inject constructor(
         val userId = getUserId()
         val userPassword = getUserPassword()
         val accessToken = getAccessToken()
-        val refreshToken = getRefreshToken()
 
 
-        return if (userId.isNullOrEmpty() || userPassword.isNullOrEmpty() || accessToken.isNullOrEmpty() || refreshToken.isNullOrEmpty()) {
+        return if (userId.isNullOrEmpty() || userPassword.isNullOrEmpty() || accessToken.isNullOrEmpty()) {
             null
         } else User(
             userid = userId,
             userPassword = userPassword,
             accessToken = accessToken,
-            refreshToken = refreshToken
         )
     }
 
-    fun saveJWToken(accessToken: String, refreshToken: String) {
+    fun saveJWToken(accessToken: String) {
         with(editor) {
-            putString(KEY_REFRESH_TOKEN, refreshToken)
             putString(KEY_ACCESS_TOKEN, accessToken)
             apply()
         }
@@ -73,9 +69,6 @@ class LocalUserRepository @Inject constructor(
         return sharedPreferences.getString(KEY_USER_PASSWORD, null)
     }
 
-    fun getRefreshToken(): String? {
-        return sharedPreferences.getString(KEY_REFRESH_TOKEN, null)
-    }
 
     fun getAccessToken(): String? {
         return sharedPreferences.getString(KEY_ACCESS_TOKEN, null)
@@ -83,7 +76,6 @@ class LocalUserRepository @Inject constructor(
 
     fun clearUserData() {
         with(editor) {
-            remove(KEY_REFRESH_TOKEN)
             remove(KEY_ACCESS_TOKEN)
             remove(KEY_USER_ID)
             remove(KEY_USER_PASSWORD)

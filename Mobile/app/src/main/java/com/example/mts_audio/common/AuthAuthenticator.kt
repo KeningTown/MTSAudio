@@ -27,14 +27,14 @@ class AuthAuthenticator @Inject constructor(
 
     override fun authenticate(route: Route?, response: Response): Request? {
         return runBlocking {
-            val token = userRepository.getRefreshToken()
+            val token = userRepository.getAccessToken()
             when (val newToken = getNewToken(token)) {
                 is Result.Success -> {
                     newToken.data.apply {
-                        userRepository.saveJWToken(refreshToken, accessToken)
+                        userRepository.saveJWToken(access_token)
                     }
                     response.request.newBuilder()
-                        .header("Authorization", "Bearer ${newToken.data.accessToken}")
+                        .header("Authorization", "Bearer ${newToken.data.access_token}")
                         .build()
                 }
                 is Result.Error -> {
@@ -52,7 +52,7 @@ class AuthAuthenticator @Inject constructor(
             .addInterceptor(loggingInterceptor)
             .build()
         val retrofit = Retrofit.Builder()
-            .baseUrl("")
+            .baseUrl("http://10.0.2.2:80/")
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .client(okHttpClient)

@@ -31,7 +31,7 @@ class LoginViewModel @Inject constructor(
 
         if (result is Result.Success) {
             _loginResult.value = AuthResult(success = result.data)
-            Log.d("TAG", "access token${result.data.accessToken}")
+            Log.d("TAG", "access token${result.data.access_token}")
         } else {
             _loginResult.value = AuthResult(error = R.string.error_string)
         }

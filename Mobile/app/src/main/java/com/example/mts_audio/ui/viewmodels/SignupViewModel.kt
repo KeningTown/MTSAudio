@@ -24,12 +24,12 @@ class SignupViewModel @Inject constructor(
     private val _signupResult = MutableLiveData<AuthResult>()
     val signupResult: LiveData<AuthResult> = _signupResult
 
-    suspend fun signup(email: String, password: String, username: String) {
-        val result = authRepository.signup(email, password, username)
+    suspend fun signup(password: String, username: String) {
+        val result = authRepository.signup(password, username)
 
         if (result is Result.Success) {
             _signupResult.value = AuthResult(success = result.data)
-            Log.d("TAG", "access token${result.data.accessToken}")
+            Log.d("TAG", "access token${result.data.access_token}")
         } else {
             _signupResult.value = AuthResult(error = R.string.error_string)
         }

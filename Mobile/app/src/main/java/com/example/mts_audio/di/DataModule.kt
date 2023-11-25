@@ -69,7 +69,7 @@ class DataModule {
     @Provides
     fun provideRetrofitBuilder(): Retrofit.Builder =
         Retrofit.Builder()
-            .baseUrl("https://drive.google.com/")
+            .baseUrl("http://10.0.2.2:80/")
             .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .addConverterFactory(GsonConverterFactory.create())
 

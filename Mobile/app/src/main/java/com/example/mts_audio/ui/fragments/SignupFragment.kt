@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.fragment.app.viewModels
@@ -46,21 +47,22 @@ class SignupFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentSignupBinding.inflate(inflater)
+
+
+        userViewModel.user.observe(viewLifecycleOwner, Observer {
+            if (it != null){
+                findNavController().navigate(R.id.action_signupFragment_to_mainFragment)
+            }
+        })
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        userViewModel.user.observe(viewLifecycleOwner) { user ->
-            if (user != null) run {
-                findNavController().navigate(R.id.action_loginFragment_to_mainFragment)
-            }
-        }
 
-        binding.signupButton.setOnClickListener {
-            findNavController().navigate(R.id.action_signupFragment_to_mainFragment)
-        }
+
 
         binding.loginButton.setOnClickListener {
             findNavController().navigateUp()
@@ -91,19 +93,45 @@ class SignupFragment : Fragment() {
                     User(
                         loginResult.success.user.id,
                         loginResult.toString(),
-                        loginResult.success.accessToken,
-                        loginResult.success.refreshToken
+                        loginResult.success.access_token,
                     )
                 )
-                findNavController().navigate(R.id.action_signupFragment_to_mainFragment)
+
             }
         })
+
+        binding.userPasswordInput.apply {
+            afterTextChanged {
+                viewModel.signupDataChanged(
+                    binding.userNameInput.text.toString(),
+                    binding.userPasswordInput.text.toString()
+                )
+            }
+
+            setOnEditorActionListener { _, actionId, _ ->
+                when (actionId) {
+                    EditorInfo.IME_ACTION_DONE ->
+                        signup(
+                            binding.userNameInput.text.toString(),
+                            binding.userPasswordInput.text.toString(),
+                        )
+                }
+                false
+            }
+
+            binding.signupButton.setOnClickListener {
+                signup(
+                    binding.userNameInput.text.toString(),
+                    binding.userPasswordInput.text.toString(),
+                )
+            }
+        }
     }
 
 
-    private fun signup(email: String, password: String, username: String) {
+    private fun signup(username: String, password: String) {
         GlobalScope.launch(Dispatchers.Main) {
-            viewModel.signup(email, password, username)
+            viewModel.signup(password, username)
         }
     }
 

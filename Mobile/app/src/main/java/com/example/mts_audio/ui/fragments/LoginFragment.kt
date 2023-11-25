@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.StringRes
@@ -43,11 +45,6 @@ class LoginFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentLoginBinding.inflate(layoutInflater)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
 
         userViewModel.user.observe(viewLifecycleOwner) { user ->
             if (user != null) run {
@@ -55,9 +52,12 @@ class LoginFragment : Fragment() {
             }
         }
 
-        binding.loginButton.setOnClickListener {
-            findNavController().navigate(R.id.action_loginFragment_to_mainFragment)
-        }
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
 
         binding.signupButton.setOnClickListener {
             findNavController().navigate(R.id.action_loginFragment_to_signupFragment)
@@ -84,24 +84,55 @@ class LoginFragment : Fragment() {
             }
             if (loginResult.success != null) {
                 updateUiWithUser(loginResult.success.user.username)
+                Log.d("TAG", "${loginResult.success}")
                 userViewModel.saveUser(
                     User(
                         loginResult.success.user.id,
                         binding.userPasswordInput.toString(),
-                        loginResult.success.accessToken,
-                        loginResult.success.refreshToken,
+                        loginResult.success.access_token,
                     )
                 )
-                findNavController().navigate(R.id.action_loginFragment_to_mainFragment)
             }
         })
 
+        binding.userNameInput.afterTextChanged {
+            viewModel.loginDataChanged(
+                binding.userNameInput.text.toString(),
+                binding.userPasswordInput.text.toString()
+            )
+        }
 
+        binding.userPasswordInput.apply {
+            afterTextChanged {
+                viewModel.loginDataChanged(
+                    binding.userNameInput.text.toString(),
+                    binding.userPasswordInput.text.toString()
+                )
+            }
+
+            setOnEditorActionListener { _, actionId, _ ->
+                when (actionId) {
+                    EditorInfo.IME_ACTION_DONE ->
+                        login(
+                            binding.userNameInput.text.toString(),
+                            binding.userPasswordInput.text.toString(),
+                        )
+                }
+                false
+            }
+
+            binding.loginButton.setOnClickListener {
+                login(
+                    binding.userNameInput.text.toString(),
+                    binding.userPasswordInput.text.toString(),
+                    )
+            }
+        }
     }
 
-    private fun login(email: String, password: String) {
+    private fun login(username: String, password: String) {
         GlobalScope.launch(Dispatchers.Main) {
-            viewModel.login(email, password)
+            viewModel.login(username, password)
         }
     }
 

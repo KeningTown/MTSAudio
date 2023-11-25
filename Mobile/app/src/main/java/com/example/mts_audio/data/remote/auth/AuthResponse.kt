@@ -5,16 +5,12 @@ data class AuthResult(
     val error: Int? = null
 )
 data class AuthResponse(
-    val accessToken: String,
-    val refreshToken: String,
+    val access_token: String,
     val user: User
 )
 
 data class User(
     val id: String,
-    val email: String,
     val username: String,
     val password: String,
-    val isActivated: Boolean,
-    val activationLink: String
 )
