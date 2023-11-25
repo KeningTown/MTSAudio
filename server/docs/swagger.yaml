@@ -1,0 +1,218 @@
+basePath: /
+definitions:
+  entities.User:
+    properties:
+      id:
+        type: integer
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  httphandlers.CreateRoom.response:
+    properties:
+      roomId:
+        type: string
+    type: object
+  httphandlers.RefreshTokens.token:
+    properties:
+      access_token:
+        type: string
+    type: object
+  httphandlers.ResponseUser:
+    properties:
+      id:
+        type: integer
+      username:
+        type: string
+    type: object
+  httphandlers.UserSignIn.response:
+    properties:
+      access_token:
+        type: string
+      user:
+        $ref: '#/definitions/httphandlers.ResponseUser'
+    type: object
+  httphandlers.UserSignIn.userCreadentials:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  httphandlers.UserSignUp.userData:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  httputils.ResponseError:
+    properties:
+      err:
+        example: error occures
+        type: string
+    type: object
+host: localhost:80
+info:
+  contact:
+    email: soldatovalex207z@gmail.com
+    name: Alexander Soldatov
+  description: Server for mtsaudio
+  termsOfService: http://swagger.io/terms/
+  title: MTSAudio
+  version: "1.0"
+paths:
+  /api/Account/Me:
+    get:
+      description: Просмотр информации о текущем авторизованном аккаунте
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputils.ResponseError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputils.ResponseError'
+      security:
+      - ApiKeyAuth: []
+      summary: Просмотр данных текущего аккаунта
+      tags:
+      - AccountController
+  /api/Account/RefreshTokens:
+    get:
+      description: Обновление токенов и получение access_token в JSON и refresh_token
+        в cookie
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/httphandlers.RefreshTokens.token'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputils.ResponseError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputils.ResponseError'
+      summary: Обновление токенов
+      tags:
+      - AccountController
+  /api/Account/SignIn:
+    post:
+      consumes:
+      - application/json
+      description: Вход в аккаунт пользователя с использованием имени пользователя
+        - username и паролем - password и получение jwt
+      parameters:
+      - description: User credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/httphandlers.UserSignIn.userCreadentials'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/httphandlers.UserSignIn.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputils.ResponseError'
+      summary: Вход в аккаунт
+      tags:
+      - AccountController
+  /api/Account/SignOut:
+    post:
+      description: Внесение текущего используемого токена доступа в черный список
+        токенов
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputils.ResponseError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputils.ResponseError'
+      security:
+      - ApiKeyAuth: []
+      summary: Выход из аккаунта
+      tags:
+      - AccountController
+  /api/Account/SignUp:
+    post:
+      consumes:
+      - application/json
+      description: Регистрация пользовате и получение jwt
+      parameters:
+      - description: User data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/httphandlers.UserSignUp.userData'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/httphandlers.UserSignIn.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputils.ResponseError'
+      summary: Регистрация
+      tags:
+      - AccountController
+  /api/Room:
+    post:
+      description: Создание новой комнаты и получение ее uuid
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httphandlers.CreateRoom.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputils.ResponseError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputils.ResponseError'
+      security:
+      - ApiKeyAuth: []
+      summary: Создание новой комнаты
+      tags:
+      - RoomController
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
