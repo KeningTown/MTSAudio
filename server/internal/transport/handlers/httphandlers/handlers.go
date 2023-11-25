@@ -1,6 +1,7 @@
 package httphandlers
 
 import (
+	"log"
 	"mtsaudio/internal/entities"
 	"mtsaudio/internal/transport/handlers/websockethandlers"
 	"mtsaudio/internal/utils/httputils"
@@ -65,6 +66,8 @@ func (hh HTTPHandler) UserSignIn(ctx *gin.Context) {
 		User        ResponseUser `json:"user"`
 		AccessToken string       `json:"access_token"`
 	}
+
+	log.Printf("user sign in: userId = %d username = %s", user.Id, user.Username)
 
 	ctx.SetCookie("refresh_token", refreshToken, 2592000, "/", "localhost", false, true)
 	ctx.JSON(201, response{
@@ -140,6 +143,8 @@ func (hh HTTPHandler) UserSignUp(ctx *gin.Context) {
 		User        ResponseUser `json:"user"`
 		AccessToken string       `json:"access_token"`
 	}
+
+	log.Printf("sign up new user: userId = %d username = %s", user.Id, user.Username)
 
 	ctx.SetCookie("refresh_token", refreshToken, 2592000, "/", "localhost", false, true)
 	ctx.JSON(201, response{
@@ -217,6 +222,8 @@ func (hh HTTPHandler) CreateRoom(ctx *gin.Context) {
 	type response struct {
 		RoomId string `json:"roomId"`
 	}
+
+	log.Printf("created new room: roomId = %s ownerId = %d", roomId, id)
 
 	ctx.JSON(http.StatusOK, response{RoomId: roomId})
 }

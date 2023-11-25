@@ -34,6 +34,7 @@ func (s *Server) Run(ctx context.Context, huc httphandlers.AuthUsecase, wsUc web
 	//auth routes
 	httpHandler := httphandlers.New(huc)
 	wsHandler := websockethandlers.New(wsUc)
+
 	//user auth routes
 	authRouts := s.router.Group("/", middleware.CheckAuthification())
 	s.router.POST("/api/Account/SignIn", httpHandler.UserSignIn)
@@ -52,11 +53,9 @@ func (s *Server) Run(ctx context.Context, huc httphandlers.AuthUsecase, wsUc web
 	})
 
 	s.router.GET("/ws/:roomId/file", func(ctx *gin.Context) {
-		username := ctx.GetString("username")
 		roomId := ctx.Param("roomId")
-		fileName := ctx.Query("fileName")
 
-		wsHandler.FileConnect(roomId, username, fileName)(ctx.Writer, ctx.Request)
+		wsHandler.FileConnect(roomId)(ctx.Writer, ctx.Request)
 	})
 
 	srv := http.Server{

@@ -52,6 +52,15 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
+type chatMessage struct {
+	Username string `json:"username"`
+	Msg      string `json:"msg"`
+}
+
+type accessToken struct {
+	AccessToken string `json:"access_token"`
+}
+
 func (wh WebsocketHandler) ChatConnect(roomId string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
@@ -62,20 +71,18 @@ func (wh WebsocketHandler) ChatConnect(roomId string) http.HandlerFunc {
 		}
 		defer conn.Close()
 
-		type accessToken struct {
-			AccessToken string `json:"access_token"`
-		}
-
 		var token accessToken
 		if err := conn.ReadJSON(&token); err != nil {
 			log.Printf("failed to parse JSON: %s", err.Error())
-			conn.WriteJSON(httputils.ResponseError{Error: "access_token required"})
+			conn.WriteMessage(websocket.CloseMessage,
+				websocket.FormatCloseMessage(websocket.CloseInvalidFramePayloadData, "access token required"))
 			return
 		}
 
 		tokenData, err := tokens.ParseToken(token.AccessToken)
 		if err != nil {
-			conn.WriteJSON(httputils.ResponseError{Error: "invalid access token"})
+			conn.WriteMessage(websocket.CloseMessage,
+				websocket.FormatCloseMessage(websocket.CloseInvalidFramePayloadData, "invalid access token"))
 			log.Printf("failed to parse token")
 			return
 		}
@@ -92,6 +99,7 @@ func (wh WebsocketHandler) ChatConnect(roomId string) http.HandlerFunc {
 			room.Mu.Lock()
 			delete(room.Clients, client)
 			room.Mu.Unlock()
+			log.Printf("user: %s disconnected from chat room: %s", client.username, roomId)
 		}()
 
 		room.Mu.Lock()
@@ -106,23 +114,23 @@ func (wh WebsocketHandler) ChatConnect(roomId string) http.HandlerFunc {
 		room.Mu.RUnlock()
 
 		if err := conn.WriteJSON(clients); err != nil {
-			conn.WriteJSON(httputils.ResponseError{Error: "unexpected error"})
+			conn.WriteMessage(websocket.CloseMessage,
+				websocket.FormatCloseMessage(websocket.CloseInvalidFramePayloadData, "failed to send users list"))
 			log.Println("failed to send user amount")
 			return
 		}
 
-		type message struct {
-			Username string `json:"username"`
-			Msg      string `json:"msg"`
-		}
+		log.Printf("user %s connected to chat room: %s", username, roomId)
 
 		for {
-			var msg message
+			var msg chatMessage
 
 			if err := conn.ReadJSON(&msg); err != nil {
 				log.Printf("chat websocket error: %s", err.Error())
 				continue
 			}
+
+			log.Printf("chat message recived: roomId: %s, user: %s, msg: %s", roomId, msg.Username, msg.Msg)
 			msgData, err := json.Marshal(&msg)
 			if err != nil {
 				log.Printf("chat websocket error: %s", err.Error())
@@ -133,7 +141,17 @@ func (wh WebsocketHandler) ChatConnect(roomId string) http.HandlerFunc {
 	}
 }
 
-func (wh WebsocketHandler) FileConnect(roomId, username, filename string) http.HandlerFunc {
+type fileMessage struct {
+	Filename string `json:"file_name"`
+	OwnerId  uint   `json:"owner_id"`
+}
+
+type audioMessage struct {
+	AudioName string `json:"audio_name"`
+	Chunk     []byte `json:"chunk"`
+}
+
+func (wh WebsocketHandler) FileConnect(roomId string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
@@ -142,9 +160,25 @@ func (wh WebsocketHandler) FileConnect(roomId, username, filename string) http.H
 		}
 		defer conn.Close()
 
+		var token accessToken
+		if err := conn.ReadJSON(&token); err != nil {
+			log.Printf("failed to parse JSON: %s", err.Error())
+			conn.WriteMessage(websocket.CloseMessage,
+				websocket.FormatCloseMessage(websocket.CloseInvalidFramePayloadData, "access token required"))
+			return
+		}
+
+		tokenData, err := tokens.ParseToken(token.AccessToken)
+		if err != nil {
+			conn.WriteMessage(websocket.CloseMessage,
+				websocket.FormatCloseMessage(websocket.CloseInvalidFramePayloadData, "invalid access token"))
+			log.Printf("failed to parse token")
+			return
+		}
+
 		client := Client{
 			conn:     conn,
-			username: username,
+			username: tokenData.Username,
 		}
 
 		room := FileRooms[roomId]
@@ -153,68 +187,69 @@ func (wh WebsocketHandler) FileConnect(roomId, username, filename string) http.H
 			room.Mu.Lock()
 			delete(room.Clients, client)
 			room.Mu.Unlock()
+			log.Printf("user: %s disconnected from file room: %s", client.username, roomId)
 		}()
 
 		room.Mu.Lock()
 
 		room.Clients[client] = struct{}{}
 		room.Mu.Unlock()
-
-		type message struct {
-			Filename string `json:"file_name"`
-			OwnerId  uint   `json:"owner_id"`
-		}
-
+		log.Printf("user: %s connected to file room: %s", client.username, roomId)
+		//listen messages
 		for {
-			var msg message
+			var msg fileMessage
 			if err := conn.ReadJSON(&msg); err != nil {
 				continue
 			}
 
 			if msg.OwnerId != room.OwnerId {
-				log.Println("no right to start sending file")
+				log.Printf("no right to start sending file: userId = %d, ownerId = %d", msg.OwnerId, room.OwnerId)
 				continue
 			}
+
 			filePath := fmt.Sprintf("./static/%s", msg.Filename)
 			absFilePath, err := filepath.Abs(filePath)
+			if err != nil {
+				log.Printf("failed to resolve abs path to file: %s", absFilePath)
+				continue
+			}
 
 			fs, err := os.Open(absFilePath)
 
 			if err != nil {
+				log.Printf("failed to open file: %s", absFilePath)
 				conn.WriteJSON(httputils.ResponseError{
 					Error: fmt.Sprintf("failed to open file: %s", absFilePath),
 				})
 				continue
 			}
 			defer fs.Close()
-
-			type audioMessage struct {
-				AudioName string `json:"audio_name"`
-				Chunk     []byte `json:"chunk"`
-			}
-
+			log.Printf("sending file: roomId = %s, filename = %s", roomId, msg.Filename)
+			//sending file
 			for {
 				buffer := make([]byte, 1024)
 				n, err := fs.Read(buffer)
 				if err != nil {
+					fs.Close()
 					if err == io.EOF {
-						log.Printf("finished to send file: %s", filename)
+						log.Printf("finished to send file: %s", msg.Filename)
 						break
 					}
-					log.Print("fileWebsocket error: ", err.Error())
+					log.Print("file websocket error: ", err.Error())
 					break
 				}
 
 				msg := audioMessage{
-					AudioName: filename,
+					AudioName: msg.Filename,
 					Chunk:     buffer[:n],
 				}
 
 				msgData, err := json.Marshal(msg)
 				if err != nil {
-					log.Printf("chat websocket error: %s", err.Error())
+					log.Printf("file websocket error: %s", err.Error())
 					continue
 				}
+
 				room.broadcast(msgData)
 			}
 		}
