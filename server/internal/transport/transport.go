@@ -58,6 +58,12 @@ func (s *Server) Run(ctx context.Context, huc httphandlers.AuthUsecase, wsUc web
 		wsHandler.FileConnect(roomId)(ctx.Writer, ctx.Request)
 	})
 
+	s.router.GET("/ws/:roomId/track", func(ctx *gin.Context) {
+		roomId := ctx.Param("roomId")
+
+		wsHandler.TrackConnect(roomId)(ctx.Writer, ctx.Request)
+	})
+
 	srv := http.Server{
 		Addr:    s.addr,
 		Handler: s.router,

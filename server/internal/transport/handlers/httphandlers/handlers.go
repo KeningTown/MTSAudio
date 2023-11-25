@@ -219,6 +219,13 @@ func (hh HTTPHandler) CreateRoom(ctx *gin.Context) {
 		Mu:      fileMu,
 	}
 
+	stopTrackMu := &sync.RWMutex{}
+	websockethandlers.TrackRooms[roomId] = websockethandlers.Room{
+		OwnerId: id,
+		Clients: make(map[websockethandlers.Client]struct{}),
+		Mu:      stopTrackMu,
+	}
+
 	type response struct {
 		RoomId string `json:"roomId"`
 	}

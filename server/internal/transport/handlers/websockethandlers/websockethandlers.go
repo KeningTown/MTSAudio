@@ -25,6 +25,7 @@ type WebsocketHandler struct {
 func New(wu WebsocketUsecase) WebsocketHandler {
 	ChatRooms = make(map[string]Room)
 	FileRooms = make(map[string]Room)
+	TrackRooms = make(map[string]Room)
 
 	return WebsocketHandler{wu}
 }
@@ -42,6 +43,7 @@ type Room struct {
 
 var ChatRooms map[string]Room
 var FileRooms map[string]Room
+var TrackRooms map[string]Room
 
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024 * 1024,
@@ -129,6 +131,7 @@ func (wh WebsocketHandler) ChatConnect(roomId string) http.HandlerFunc {
 				log.Printf("chat websocket error: %s", err.Error())
 				continue
 			}
+			msg.Username = client.username
 
 			log.Printf("chat message recived: roomId: %s, user: %s, msg: %s", roomId, msg.Username, msg.Msg)
 			msgData, err := json.Marshal(&msg)
@@ -143,7 +146,6 @@ func (wh WebsocketHandler) ChatConnect(roomId string) http.HandlerFunc {
 
 type fileMessage struct {
 	Filename string `json:"file_name"`
-	OwnerId  uint   `json:"owner_id"`
 }
 
 type audioMessage struct {
@@ -202,8 +204,8 @@ func (wh WebsocketHandler) FileConnect(roomId string) http.HandlerFunc {
 				continue
 			}
 
-			if msg.OwnerId != room.OwnerId {
-				log.Printf("no right to start sending file: userId = %d, ownerId = %d", msg.OwnerId, room.OwnerId)
+			if tokenData.Id != room.OwnerId {
+				log.Printf("no right to start sending file: userId = %d, ownerId = %d", tokenData.Id, room.OwnerId)
 				continue
 			}
 
@@ -252,6 +254,77 @@ func (wh WebsocketHandler) FileConnect(roomId string) http.HandlerFunc {
 
 				room.broadcast(msgData)
 			}
+		}
+	}
+}
+
+func (wh WebsocketHandler) TrackConnect(roomId string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		conn, err := upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+		defer conn.Close()
+
+		var token accessToken
+		if err := conn.ReadJSON(&token); err != nil {
+			log.Printf("failed to parse JSON: %s", err.Error())
+			conn.WriteMessage(websocket.CloseMessage,
+				websocket.FormatCloseMessage(websocket.CloseInvalidFramePayloadData, "access token required"))
+			return
+		}
+
+		tokenData, err := tokens.ParseToken(token.AccessToken)
+		if err != nil {
+			conn.WriteMessage(websocket.CloseMessage,
+				websocket.FormatCloseMessage(websocket.CloseInvalidFramePayloadData, "invalid access token"))
+			log.Printf("failed to parse token")
+			return
+		}
+
+		client := Client{
+			conn:     conn,
+			username: tokenData.Username,
+		}
+
+		room := TrackRooms[roomId]
+
+		defer func() {
+			room.Mu.Lock()
+			delete(room.Clients, client)
+			room.Mu.Unlock()
+			log.Printf("user: %s disconnected from track websocket: %s", client.username, roomId)
+		}()
+
+		room.Mu.Lock()
+
+		room.Clients[client] = struct{}{}
+		room.Mu.Unlock()
+		log.Printf("user: %s connected to track websocket: %s", client.username, roomId)
+
+		type musicPlay struct {
+			PlayMusic bool `json:"play_music"`
+		}
+
+		for {
+			var msg musicPlay
+			if err := conn.ReadJSON(&msg); err != nil {
+				continue
+			}
+
+			if tokenData.Id != room.OwnerId {
+				log.Printf("room's owner access only")
+				continue
+			}
+
+			msgData, err := json.Marshal(msg)
+			if err != nil {
+				log.Printf("chat websocket error: %s", err.Error())
+				continue
+			}
+
+			go room.broadcast(msgData)
 		}
 	}
 }

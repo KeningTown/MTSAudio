@@ -59,3 +59,26 @@ Response:
     "chunk": "*байты файла*"
 }
 ```
+
+## Документация по Track Websocket
+Root: `ws://localhost:80/ws/roomId/file`
+
+После подключения отправить `access_token`:
+```json
+{
+    "access_token": "token"
+}
+```
+В ответ ничего не придет, но так подтвердится, что пользователь авторизован.
+Владелец комнаты отсылает:
+```json
+{
+    "play_misic": true
+}
+```
+Response:
+```json
+{
+    "play_misic": true
+}
+```
