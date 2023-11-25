@@ -9,9 +9,21 @@ definitions:
       username:
         type: string
     type: object
+  httphandlers.CreateRoom.response:
+    properties:
+      roomId:
+        type: string
+    type: object
   httphandlers.RefreshTokens.token:
     properties:
       access_token:
+        type: string
+    type: object
+  httphandlers.ResponseUser:
+    properties:
+      id:
+        type: integer
+      username:
         type: string
     type: object
   httphandlers.UserSignIn.response:
@@ -19,7 +31,7 @@ definitions:
       access_token:
         type: string
       user:
-        $ref: '#/definitions/entities.User'
+        $ref: '#/definitions/httphandlers.ResponseUser'
     type: object
   httphandlers.UserSignIn.userCreadentials:
     properties:
@@ -95,6 +107,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/httputils.ResponseError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputils.ResponseError'
       summary: Обновление токенов
       tags:
       - AccountController
@@ -163,7 +179,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/entities.User'
+            $ref: '#/definitions/httphandlers.UserSignIn.response'
         "400":
           description: Bad Request
           schema:
@@ -171,6 +187,29 @@ paths:
       summary: Регистрация
       tags:
       - AccountController
+  /api/Room:
+    post:
+      description: Создание новой комнаты и получение ее uuid
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httphandlers.CreateRoom.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputils.ResponseError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputils.ResponseError'
+      security:
+      - ApiKeyAuth: []
+      summary: Создание новой комнаты
+      tags:
+      - RoomController
 securityDefinitions:
   ApiKeyAuth:
     in: header

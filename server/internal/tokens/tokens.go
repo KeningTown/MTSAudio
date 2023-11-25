@@ -44,8 +44,7 @@ func ParseToken(tokenString string) (entities.Token, error) {
 		return []byte("boba"), nil
 	})
 
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if ok && token.Valid {
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		return entities.Token{
 			Id:        uint(claims["id"].(float64)),
 			Username:  claims["username"].(string),

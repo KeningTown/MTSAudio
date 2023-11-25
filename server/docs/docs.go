@@ -78,6 +78,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/httputils.ResponseError"
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httputils.ResponseError"
+                        }
                     }
                 }
             }
@@ -181,11 +187,48 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/entities.User"
+                            "$ref": "#/definitions/httphandlers.UserSignIn.response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httputils.ResponseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/Room": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Создание новой комнаты и получение ее uuid",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "RoomController"
+                ],
+                "summary": "Создание новой комнаты",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/httphandlers.CreateRoom.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httputils.ResponseError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/httputils.ResponseError"
                         }
@@ -209,10 +252,29 @@ const docTemplate = `{
                 }
             }
         },
+        "httphandlers.CreateRoom.response": {
+            "type": "object",
+            "properties": {
+                "roomId": {
+                    "type": "string"
+                }
+            }
+        },
         "httphandlers.RefreshTokens.token": {
             "type": "object",
             "properties": {
                 "access_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "httphandlers.ResponseUser": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "username": {
                     "type": "string"
                 }
             }
@@ -224,7 +286,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user": {
-                    "$ref": "#/definitions/entities.User"
+                    "$ref": "#/definitions/httphandlers.ResponseUser"
                 }
             }
         },
