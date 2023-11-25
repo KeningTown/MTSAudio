@@ -1,4 +1,28 @@
 .login__title {
   text-align: center;
   margin: 0;
+  margin-bottom: 24px;
+  font-size: 25px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.login__logo {
+  margin-bottom: 35px;
+}
+
+.login__btn {
+  /* background-color: #FF0032; */
+}
+
+.login__problems {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.login__problems__link {
+  color: #007CFF;
+  text-decoration: none;
 }
