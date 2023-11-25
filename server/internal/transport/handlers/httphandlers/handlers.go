@@ -2,11 +2,14 @@ package httphandlers
 
 import (
 	"mtsaudio/internal/entities"
+	"mtsaudio/internal/transport/handlers/websockethandlers"
 	"mtsaudio/internal/utils/httputils"
 	"net/http"
 	"strings"
+	"sync"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type AuthUsecase interface {
@@ -23,6 +26,11 @@ type HTTPHandler struct {
 
 func New(hu AuthUsecase) HTTPHandler {
 	return HTTPHandler{hu: hu}
+}
+
+type ResponseUser struct {
+	Id       uint   `json:"id"`
+	Username string `json:"username"`
 }
 
 // @Summary Вход в аккаунт
@@ -54,13 +62,16 @@ func (hh HTTPHandler) UserSignIn(ctx *gin.Context) {
 	}
 
 	type response struct {
-		User        entities.User `json:"user"`
-		AccessToken string        `json:"access_token"`
+		User        ResponseUser `json:"user"`
+		AccessToken string       `json:"access_token"`
 	}
 
 	ctx.SetCookie("refresh_token", refreshToken, 2592000, "/", "localhost", false, true)
 	ctx.JSON(201, response{
-		User:        user,
+		User: ResponseUser{
+			Id:       user.Id,
+			Username: user.Username,
+		},
 		AccessToken: accessToken,
 	})
 }
@@ -99,7 +110,7 @@ func (hh HTTPHandler) RefreshTokens(ctx *gin.Context) {
 // @Accept json
 // @Produce  json
 // @Param request body httphandlers.UserSignUp.userData true "User data"
-// @Success 201 {object} entities.User
+// @Success 201 {object} httphandlers.UserSignIn.response
 // @Failure 400 {object} httputils.ResponseError
 // @Router /api/Account/SignUp [post]
 func (hh HTTPHandler) UserSignUp(ctx *gin.Context) {
@@ -125,13 +136,17 @@ func (hh HTTPHandler) UserSignUp(ctx *gin.Context) {
 	}
 
 	type response struct {
-		User        entities.User `json:"user"`
-		AccessToken string        `json:"access_token"`
+		// required: true
+		User        ResponseUser `json:"user"`
+		AccessToken string       `json:"access_token"`
 	}
 
 	ctx.SetCookie("refresh_token", refreshToken, 2592000, "/", "localhost", false, true)
 	ctx.JSON(201, response{
-		User:        user,
+		User: ResponseUser{
+			Id:       user.Id,
+			Username: user.Username,
+		},
 		AccessToken: accessToken,
 	})
 }
@@ -167,5 +182,41 @@ func (hh HTTPHandler) UserMyAccount(ctx *gin.Context) {
 		httputils.NewResponseError(ctx, 400, err.Error())
 		return
 	}
+
 	ctx.JSON(http.StatusOK, user)
+}
+
+// @Summary Создание новой комнаты
+// @Tags RoomController
+// @Description Создание новой комнаты и получение ее uuid
+// @Produce  json
+// @Security ApiKeyAuth
+// @Success 200 {object} httphandlers.CreateRoom.response
+// @Failure 400 {object} httputils.ResponseError
+// @Failure 401 {object} httputils.ResponseError
+// @Router /api/Room [post]
+func (hh HTTPHandler) CreateRoom(ctx *gin.Context) {
+	id := ctx.GetUint("id")
+
+	roomId := uuid.New().String()
+
+	chatMu := &sync.RWMutex{}
+	websockethandlers.ChatRooms[roomId] = websockethandlers.Room{
+		OwnerId: id,
+		Clients: make(map[websockethandlers.Client]struct{}),
+		Mu:      chatMu,
+	}
+
+	fileMu := &sync.RWMutex{}
+	websockethandlers.FileRooms[roomId] = websockethandlers.Room{
+		OwnerId: id,
+		Clients: make(map[websockethandlers.Client]struct{}),
+		Mu:      fileMu,
+	}
+
+	type response struct {
+		RoomId string `json:"roomId"`
+	}
+
+	ctx.JSON(http.StatusOK, response{RoomId: roomId})
 }

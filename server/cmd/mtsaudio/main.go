@@ -8,6 +8,7 @@ import (
 	"mtsaudio/internal/tokens"
 	"mtsaudio/internal/transport"
 	"mtsaudio/internal/usecase/authusecase"
+	websocketusecase "mtsaudio/internal/usecase/roomusecase"
 	"os"
 	"os/signal"
 	"syscall"
@@ -46,5 +47,7 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT, os.Interrupt)
 	defer stop()
 
-	srv.Run(ctx, authUsecase)
+	wsUsecase := websocketusecase.New(db)
+
+	srv.Run(ctx, authUsecase, wsUsecase)
 }
