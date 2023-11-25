@@ -55,6 +55,14 @@ class LoginFragment : Fragment() {
             }
         }
 
+        binding.loginButton.setOnClickListener {
+            findNavController().navigate(R.id.action_loginFragment_to_mainFragment)
+        }
+
+        binding.signupButton.setOnClickListener {
+            findNavController().navigate(R.id.action_loginFragment_to_signupFragment)
+        }
+
         viewModel.loginState.observe(viewLifecycleOwner, Observer {
             val loginState = it ?: return@Observer
 
@@ -79,7 +87,7 @@ class LoginFragment : Fragment() {
                 userViewModel.saveUser(
                     User(
                         loginResult.success.user.id,
-                        loginResult.toString(),
+                        binding.userPasswordInput.toString(),
                         loginResult.success.accessToken,
                         loginResult.success.refreshToken,
                     )

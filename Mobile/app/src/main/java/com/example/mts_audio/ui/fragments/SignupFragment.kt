@@ -58,6 +58,14 @@ class SignupFragment : Fragment() {
             }
         }
 
+        binding.signupButton.setOnClickListener {
+            findNavController().navigate(R.id.action_signupFragment_to_mainFragment)
+        }
+
+        binding.loginButton.setOnClickListener {
+            findNavController().navigateUp()
+        }
+
         viewModel.signupState.observe(viewLifecycleOwner, Observer {
             val loginState = it ?: return@Observer
 
