@@ -8,7 +8,9 @@ class AppWebSocketListener(
     private val socketName: String
 ) : WebSocketListener() {
 
-    private final val NORMAL_CLOSURE_STATUS = 1000
+    companion object{
+        val NORMAL_CLOSURE_STATUS = 1000
+    }
     override fun onOpen(webSocket: WebSocket, response: okhttp3.Response) {
         super.onOpen(webSocket, response)
         println("$socketName opened")

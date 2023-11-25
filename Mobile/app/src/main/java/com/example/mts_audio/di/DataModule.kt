@@ -5,7 +5,10 @@ import android.content.SharedPreferences
 import com.example.mts_audio.common.AuthAuthenticator
 import com.example.mts_audio.common.AuthInterceptor
 import com.example.mts_audio.data.remote.auth.AuthApi
+import com.example.mts_audio.data.remote.lobby.LobbyApi
+import com.example.mts_audio.data.remote.websocket.WebSocketManager
 import com.example.mts_audio.data.repository.AuthRepository
+import com.example.mts_audio.data.repository.LobbyRepository
 import com.example.mts_audio.data.repository.LocalUserRepository
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import dagger.Module
@@ -17,7 +20,9 @@ import kotlinx.coroutines.Dispatchers
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import retrofit2.Retrofit.Builder
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.create
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -86,6 +91,30 @@ class DataModule {
             )
             .build()
             .create(AuthApi::class.java)
+
+    @Singleton
+    @Provides
+    fun provideLobbyAPIService(retrofit: Builder, okHttpClient: OkHttpClient): LobbyApi =
+        retrofit
+            .client(okHttpClient)
+            .build()
+            .create(LobbyApi::class.java)
+
+
+    @Singleton
+    @Provides
+    fun provideLobbyRepository(lobbyApi: LobbyApi): LobbyRepository {
+        return LobbyRepository(lobbyApi, Dispatchers.IO)
+    }
+
+    @Singleton
+    @Provides
+    fun provideWebsocketManager(): WebSocketManager {
+        return WebSocketManager(
+            OkHttpClient.Builder()
+                .build()
+        )
+    }
 
     @Provides
     @Singleton

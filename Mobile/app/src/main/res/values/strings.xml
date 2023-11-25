@@ -18,4 +18,5 @@
     <string name="you_enter">Вы входите в сервис МТС Music</string>
     <string name="have_account">Уже есть аккаунт?</string>
     <string name="registr">Регистрация</string>
+    <string name="error_get_lobby">Ошибка подключения к комнате</string>
 </resources>
