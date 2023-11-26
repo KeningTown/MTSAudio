@@ -151,6 +151,7 @@ type fileMessage struct {
 type audioMessage struct {
 	AudioName string `json:"audio_name"`
 	Chunk     []byte `json:"chunk"`
+	Done      bool   `json:"done"`
 }
 
 func (wh WebsocketHandler) FileConnect(roomId string) http.HandlerFunc {
@@ -231,6 +232,12 @@ func (wh WebsocketHandler) FileConnect(roomId string) http.HandlerFunc {
 			for {
 				buffer := make([]byte, 1024)
 				n, err := fs.Read(buffer)
+
+				var done bool
+				if n == 1024 {
+					done = true
+				}
+
 				if err != nil {
 					fs.Close()
 					if err == io.EOF {
@@ -244,6 +251,7 @@ func (wh WebsocketHandler) FileConnect(roomId string) http.HandlerFunc {
 				msg := audioMessage{
 					AudioName: msg.Filename,
 					Chunk:     buffer[:n],
+					Done:      done,
 				}
 
 				msgData, err := json.Marshal(msg)
