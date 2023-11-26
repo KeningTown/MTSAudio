@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -34,6 +35,12 @@ func (s *Server) Run(ctx context.Context, hUc httphandlers.AuthUsecase, wsUc web
 	//auth routes
 	httpHandler := httphandlers.New(hUc, tUc)
 	wsHandler := websockethandlers.New(wsUc)
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"http://localhost:4200"}
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+	config.AllowHeaders = []string{"Origin", "Content-Type", "Content-Length", "Accept-Encoding", "Authorization"}
+
+	s.router.Use(cors.New(config))
 
 	//auth routes
 	authRouts := s.router.Group("/", middleware.CheckAuthification())
