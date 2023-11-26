@@ -7,9 +7,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
+import com.example.mts_audio.MessageRecyclerViewAdapter
 import com.example.mts_audio.R
 import com.example.mts_audio.databinding.FragmentLobbyBinding
+import com.example.mts_audio.ui.model.MessageItem
 import com.example.mts_audio.ui.viewmodels.LobbyViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -28,6 +31,9 @@ class LobbyFragment : Fragment() {
 
     private var lobbyId: String = ""
     private var isOwner: Boolean = false
+
+
+    private val chatData: MutableList<MessageItem> = mutableListOf()
 
 
     override fun onCreateView(
@@ -49,6 +55,11 @@ class LobbyFragment : Fragment() {
         binding.send.setOnClickListener {
             sendMessage("Hi")
         }
+
+        viewModel.lobbyMessages.observe(viewLifecycleOwner, Observer {
+            chatData.add(it)
+            binding.recyclerViewMessage.adapter = MessageRecyclerViewAdapter(chatData)
+        })
     }
 
     private fun sendMessage(message: String) {

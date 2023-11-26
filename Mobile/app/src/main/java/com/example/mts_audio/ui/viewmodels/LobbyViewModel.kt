@@ -10,6 +10,7 @@ import com.example.mts_audio.data.remote.websocket.WebSocketManager
 import com.example.mts_audio.data.repository.LobbyRepository
 import com.example.mts_audio.data.repository.LocalUserRepository
 import com.example.mts_audio.ui.model.Message
+import com.example.mts_audio.ui.model.MessageItem
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import okhttp3.WebSocket
@@ -25,9 +26,14 @@ class LobbyViewModel @Inject constructor(
     private val _roomResult = MutableLiveData<LobbyResult>()
     val roomResult: LiveData<LobbyResult> = _roomResult
 
+    private val _lobbyMessages = MutableLiveData<MessageItem>()
+    val lobbyMessages: LiveData<MessageItem> = _lobbyMessages
+
     private var chatSocket: WebSocket? = null
     private var musicSocket: WebSocket? = null
     private var fileSocket: WebSocket? = null
+
+    private val userName = localUserRepository.getUserName()!!
 
     fun setRoom(roomId: String) {
         chatSocket = webSocketManager.createChatWebSocket("ws://10.0.2.2:80/ws", "${roomId}/chat"){
@@ -42,6 +48,8 @@ class LobbyViewModel @Inject constructor(
 
     private fun onMessage(message: String) {
         val outPut = parseJson(message)
+        val isClient = (outPut.username == userName)
+         _lobbyMessages.value = MessageItem(Message(outPut.username,outPut.msg), isClient)
         Log.d("msg", "${outPut!!.toJsonString()}")
     }
 
@@ -54,12 +62,12 @@ class LobbyViewModel @Inject constructor(
             val gson = Gson()
             gson.fromJson(jsonString, Message::class.java)
         } catch (e: Exception) {
-            Message(localUserRepository.getUserName()!!, "error")
+            Message(userName, "error")
         }
     }
 
     fun sendMessageToChat(message: String){
-        chatSocket?.send(Message(localUserRepository.getUserName()!!,message).toJsonString())
+        chatSocket?.send(Message(userName,message).toJsonString())
     }
     fun closeConnection(){
         chatSocket?.close(1000, "Close")

@@ -24,4 +24,5 @@
     <string name="create_lobby">Создать комнату</string>
     <string name="lobbyId">lobbyId</string>
     <string name="send_message">Отправить сообщение</string>
+    <string name="sample_message">message sample</string>
 </resources>
