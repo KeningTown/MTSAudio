@@ -17,4 +17,19 @@ class WebSocketManager(
         return okHttpClient.newWebSocket(request, AppWebSocketListener(endpoint))
     }
 
+    fun createChatWebSocket(baseUrl: String, endpoint: String, messageHandler: (String) -> Unit): WebSocket {
+        val url = "$baseUrl/$endpoint"
+        Log.d("WEBSOCKET", url)
+        val request = Request.Builder().url(url).build()
+        return okHttpClient.newWebSocket(request, ChatWebSocketListener(endpoint, messageHandler))
+    }
+
+
+    fun createFileWebSocket(baseUrl: String, endpoint: String): WebSocket {
+        val url = "$baseUrl/$endpoint"
+        Log.d("WEBSOCKET", url)
+        val request = Request.Builder().url(url).build()
+        return okHttpClient.newWebSocket(request, AppWebSocketListener(endpoint))
+    }
+
 }

@@ -26,29 +26,17 @@ class MainViewModel @Inject constructor(
     private val _roomResult = MutableLiveData<LobbyResult>()
     val roomResult: LiveData<LobbyResult> = _roomResult
 
-    private var chatSocket:WebSocket? = null
-    private var musicSocket:WebSocket? = null
 
     suspend fun getRoom() {
         val result = lobbyRepository.getRoom()
 
         if (result is Result.Success) {
             _roomResult.value = LobbyResult(success = result.data)
-            chatSocket = webSocketManager.createWebSocket("ws://10.0.2.2:80/ws", "${result.data.roomId}/chat")
-            chatSocket!!.send(accessTokenToJSON(localUserRepository.getAccessToken()!!))
-            musicSocket = webSocketManager.createWebSocket("ws://10.0.2.2:80/ws", "${result.data.roomId}/music")
-            musicSocket!!.send((accessTokenToJSON(localUserRepository.getAccessToken()!!)))
             Log.d("TAG", "lobby id ${result.data.roomId}")
         } else {
             _roomResult.value = LobbyResult(error = R.string.error_get_lobby)
         }
     }
 
-    private fun accessTokenToJSON(accessToken:String): String {
-       return "{\"access_token\": \"${accessToken}\"}"
-    }
 
-    fun closeConnection(){
-        chatSocket?.close(1000, "Close")
-    }
 }

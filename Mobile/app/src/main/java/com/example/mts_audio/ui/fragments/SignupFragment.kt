@@ -92,6 +92,7 @@ class SignupFragment : Fragment() {
                 userViewModel.saveUser(
                     User(
                         loginResult.success.user.id,
+                        loginResult.success.user.username,
                         loginResult.toString(),
                         loginResult.success.access_token,
                     )

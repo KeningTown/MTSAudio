@@ -88,6 +88,7 @@ class LoginFragment : Fragment() {
                 userViewModel.saveUser(
                     User(
                         loginResult.success.user.id,
+                        loginResult.success.user.username,
                         binding.userPasswordInput.toString(),
                         loginResult.success.access_token,
                     )

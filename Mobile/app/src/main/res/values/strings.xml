@@ -19,4 +19,9 @@
     <string name="have_account">Уже есть аккаунт?</string>
     <string name="registr">Регистрация</string>
     <string name="error_get_lobby">Ошибка подключения к комнате</string>
+    <string name="lobby_id">Номер комнаты</string>
+    <string name="enter_lobby">Войти в комнату</string>
+    <string name="create_lobby">Создать комнату</string>
+    <string name="lobbyId">lobbyId</string>
+    <string name="send_message">Отправить сообщение</string>
 </resources>

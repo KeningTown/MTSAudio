@@ -4,7 +4,7 @@ import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import okio.ByteString
 
-class AppWebSocketListener(
+open class AppWebSocketListener(
     private val socketName: String
 ) : WebSocketListener() {
 
