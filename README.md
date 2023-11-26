@@ -25,3 +25,9 @@ npm install
 cd mts-app
 ng serve --open
 ```
+
+# Preview
+<video width="320" height="240" controls>
+  <source src="Preview.mp4" type="video/mp4">
+  Ваш браузер не поддерживает тег video.
+</video>
