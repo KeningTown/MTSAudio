@@ -28,7 +28,7 @@ import { ToastModule } from 'primeng/toast';
 export class RegisterComponent {
 
   registerForm = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
+    username: ['', [Validators.required]],
     password: ['', Validators.required]
   })
 
@@ -39,8 +39,8 @@ export class RegisterComponent {
     private router: Router
     ) {  }
 
-  get email() {
-    return this.registerForm.controls['email']
+  get username() {
+    return this.registerForm.controls['username']
   }
 
   get password() {
@@ -49,6 +49,7 @@ export class RegisterComponent {
 
   submitDetails() {
     const postData = { ...this.registerForm.value };
+    console.log(postData)
     this.authService.registerUser(postData as User).subscribe(
     response => {
       console.log(response);

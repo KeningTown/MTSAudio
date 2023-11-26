@@ -6,17 +6,16 @@
       <input
         type="text"
         pInputText
-        formControlName="email"
+        formControlName="username"
         class="w-full"
-        name="email"
+        name="username"
         placeholder="Имя пользователя"
         />
       <small
-        *ngIf="email.invalid && (email.dirty || email.touched)"
+        *ngIf="username.invalid && (username.dirty || username.touched)"
         class="block p-error"
       >
-        <div *ngIf="email.errors?.['required']">Email is required.</div>
-        <div *ngIf="email.errors?.['email']">Email should be valid</div>
+        <div *ngIf="username.errors?.['required']">username is required.</div>
       </small>
     </div>
 

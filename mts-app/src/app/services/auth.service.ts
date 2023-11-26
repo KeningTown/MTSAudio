@@ -8,12 +8,12 @@ import { Observable } from 'rxjs';
 })
 export class AuthService {
 
-  private baseUrl = 'http://localhost:3000'
+  private baseUrl = 'http://localhost:80'
 
   constructor(private http: HttpClient) { }
 
   registerUser(userDetails: User) {
-    return this.http.post(`${this.baseUrl}/users`, userDetails);
+    return this.http.post(`${this.baseUrl}/api/Account/SignUp`, userDetails);
   }
 
   getUserByEmail(email: string): Observable<User[]> {
