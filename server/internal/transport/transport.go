@@ -52,6 +52,7 @@ func (s *Server) Run(ctx context.Context, hUc httphandlers.AuthUsecase, wsUc web
 
 	//track route
 	authRouts.GET("/api/Tracks", httpHandler.GetTracks)
+	authRouts.POST("/api/Tracks", httpHandler.UploadTrack)
 
 	//room handler
 	authRouts.POST("/api/Room", httpHandler.CreateRoom)
