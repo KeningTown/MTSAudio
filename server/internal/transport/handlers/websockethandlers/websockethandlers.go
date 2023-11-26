@@ -234,7 +234,7 @@ func (wh WebsocketHandler) FileConnect(roomId string) http.HandlerFunc {
 				n, err := fs.Read(buffer)
 
 				var done bool
-				if n == 1024 {
+				if n != 1024 {
 					done = true
 				}
 
