@@ -1,0 +1,51 @@
+<h1 class="login__title">Вход</h1>
+<form [formGroup]="loginForm" (ngSubmit)="loginUser()">
+  <p-card [style]="{ width: '360px' }">
+    <img class="login__logo" src="../../../assets/svg/Logo.svg" alt="Logo">
+    <div class="field">
+      <input
+        type="text"
+        pInputText
+        formControlName="email"
+        class="w-full"
+        name="email"
+        placeholder="Имя пользователя"
+        />
+      <small
+        *ngIf="shouldShowEmailError()"
+        class="block p-error"
+      >
+        <div *ngIf="email.errors?.['required']">Email is required.</div>
+        <div *ngIf="email.errors?.['email']">Email should be valid</div>
+      </small>
+    </div>
+
+    <div class="field">
+        <input
+        type="password"
+        pInputText
+        formControlName="password"
+        class="w-full"
+        name="password"
+        placeholder="Пароль"
+        />
+        <small
+          *ngIf="password.invalid && (password.dirty || password.touched)"
+          class="block p-error"
+        >
+          <div *ngIf="password.errors?.['required']">Password is required.</div>
+        </small>
+    </div>
+    <p-button
+      severity="danger"
+      label="Далее"
+      styleClass="w-full"
+      [disabled]="loginForm.invalid"
+      type="submit"
+    ></p-button>
+    <div class="mt-2 login__problems">
+      <p>Еще нет аккаунта?</p>
+      <a class="login__problems__link" routerLink="/register">Зарегистрироваться</a>
+    </div>
+  </p-card>
+</form>
