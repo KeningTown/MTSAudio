@@ -11,8 +11,8 @@
         android:layout_height="wrap_content"
         android:textSize="14sp"
         android:maxLines="3"
+        android:layout_margin="8dp"
         android:ellipsize="end"
-        android:layout_margin="@dimen/text_margin"
         tools:text="@string/sample_message"/>
 
 

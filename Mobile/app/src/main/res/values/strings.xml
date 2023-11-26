@@ -26,4 +26,7 @@
     <string name="send_message">Отправить сообщение</string>
     <string name="sample_message">message sample</string>
     <string name="write_message">Написать сообщение</string>
+    <string name="chat">Чат</string>
+    <string name="Subscribers">Участники</string>
+    <string name="link">Ссылка приглашение</string>
 </resources>

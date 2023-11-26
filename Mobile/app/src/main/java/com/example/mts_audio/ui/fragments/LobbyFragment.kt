@@ -1,11 +1,15 @@
 package com.example.mts_audio.ui.fragments
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
@@ -50,6 +54,15 @@ class LobbyFragment : Fragment() {
         lobbyId = arguments?.getString("id").toString()
         isOwner = arguments?.getBoolean("isOwner")!!
 
+
+        binding.linkCopy.text = lobbyId
+        binding.copyButton.setOnClickListener {
+            val clipboardManager = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+
+            val clipData = ClipData.newPlainText("Label", lobbyId)
+
+            clipboardManager.setPrimaryClip(clipData)
+        }
 
         binding.recyclerViewMessage.layoutManager = LinearLayoutManager(requireContext())
         setRoom(lobbyId)
