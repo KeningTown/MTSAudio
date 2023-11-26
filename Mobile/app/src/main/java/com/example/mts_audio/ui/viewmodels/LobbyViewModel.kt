@@ -13,6 +13,9 @@ import com.example.mts_audio.ui.model.Message
 import com.example.mts_audio.ui.model.MessageItem
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import okhttp3.WebSocket
 import javax.inject.Inject
 
@@ -49,7 +52,9 @@ class LobbyViewModel @Inject constructor(
     private fun onMessage(message: String) {
         val outPut = parseJson(message)
         val isClient = (outPut.username == userName)
-         _lobbyMessages.value = MessageItem(Message(outPut.username,outPut.msg), isClient)
+         GlobalScope.launch(Dispatchers.Main) {
+             _lobbyMessages.value = MessageItem(Message(outPut.username,outPut.msg), isClient)
+         }
         Log.d("msg", "${outPut!!.toJsonString()}")
     }
 

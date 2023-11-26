@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mts_audio.MessageRecyclerViewAdapter
 import com.example.mts_audio.R
 import com.example.mts_audio.databinding.FragmentLobbyBinding
@@ -50,14 +51,17 @@ class LobbyFragment : Fragment() {
         isOwner = arguments?.getBoolean("isOwner")!!
 
 
+        binding.recyclerViewMessage.layoutManager = LinearLayoutManager(requireContext())
         setRoom(lobbyId)
 
         binding.send.setOnClickListener {
-            sendMessage("Hi")
+            sendMessage(binding.message.text.toString())
         }
 
         viewModel.lobbyMessages.observe(viewLifecycleOwner, Observer {
-            chatData.add(it)
+            val lobbyMessage = it ?: return@Observer
+
+            chatData.add(lobbyMessage)
             binding.recyclerViewMessage.adapter = MessageRecyclerViewAdapter(chatData)
         })
     }

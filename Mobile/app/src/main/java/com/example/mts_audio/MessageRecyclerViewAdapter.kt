@@ -45,7 +45,10 @@ class MessageRecyclerViewAdapter(
 
         val spannableString = SpannableString(fullText)
 
-        val usernameColor = Color.BLUE
+        var usernameColor = Color.BLACK
+        if(item.isClient){
+            usernameColor = Color.BLUE
+        }
         spannableString.setSpan(ForegroundColorSpan(usernameColor), 0, username.length, 0)
 
         holder.messageItem.text = spannableString

@@ -11,4 +11,6 @@
     <color name="black_overlay">#66000000</color>
     <color name="gray">#C1C0C0</color>
     <color name="black_200">#252422</color>
+    <color name="bg">#F2F3F7</color>
+    <color name="bg_chat">#FEFEFE</color>
 </resources>
