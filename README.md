@@ -27,7 +27,4 @@ ng serve --open
 ```
 
 # Preview
-<video width="320" height="240" controls>
-  <source src="Preview.mp4" type="video/mp4">
-  Ваш браузер не поддерживает тег video.
-</video>
+[![Previw picture](Slide16_9-1.png)](https://www.youtube.com/watch?v=SdEkTDmO7io&ab_channel=%D0%A1%D0%B2%D0%BE%D0%B8%D0%BB%D1%8E%D0%B4%D0%B8-%D1%81%D0%BE%D1%87%D1%82%D0%B5%D0%BC%D1%81%D1%8F)
