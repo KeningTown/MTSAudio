@@ -1,6 +1,8 @@
 package httphandlers
 
 import (
+	"fmt"
+	"io"
 	"log"
 	"mtsaudio/internal/entities"
 	"mtsaudio/internal/transport/handlers/websockethandlers"
@@ -23,6 +25,7 @@ type AuthUsecase interface {
 
 type TrackUsecase interface {
 	GetTracksName() []string
+	UploadTrack(filename string, fs io.Reader) error
 }
 
 type HTTPHandler struct {
@@ -255,4 +258,45 @@ func (hh HTTPHandler) GetTracks(ctx *gin.Context) {
 	tracks := hh.tu.GetTracksName()
 
 	ctx.JSON(200, tracks)
+}
+
+// @Summary Загрузка трека
+// @Tags TrackController
+// @Description Загрузка трека на сервер
+// @Accept mpfd
+// @Security ApiKeyAuth
+// @Param track formData file true "Uploading file"
+// @Success 201
+// @Failure 400 {object} httputils.ResponseError
+// @Failure 401 {object} httputils.ResponseError
+// @Router /api/Tracks [post]
+func (hh HTTPHandler) UploadTrack(ctx *gin.Context) {
+	file, header, err := ctx.Request.FormFile("track")
+	if err != nil {
+		httputils.NewResponseError(ctx, 400, "faild to get file")
+		return
+	}
+	defer file.Close()
+
+	filename := header.Filename
+	if strings.Split(filename, ".")[1] != "mp3" {
+		httputils.NewResponseError(ctx, 400, ".mp3 files only")
+		return
+	}
+	fmt.Println(header.Size)
+
+	if header.Size >= 10e7 {
+		httputils.NewResponseError(ctx, 400, "file size should be < 10 MB")
+		return
+	}
+
+	if err := hh.tu.UploadTrack(filename, file); err != nil {
+		log.Printf(err.Error())
+		httputils.NewResponseError(ctx, 400, err.Error())
+		return
+	}
+
+	log.Printf("uploaded new track: %s", filename)
+
+	ctx.Status(201)
 }

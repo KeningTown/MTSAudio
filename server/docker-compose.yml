@@ -14,6 +14,8 @@ services:
       - POSTGRES_HOST=pgdb
     ports:
       - 80:80
+    volumes:
+      - ./static:/app/static/
 
   pgdb:
     image: postgres:latest

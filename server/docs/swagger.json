@@ -262,6 +262,47 @@
                         }
                     }
                 }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Загрузка трека на сервер",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "tags": [
+                    "TrackController"
+                ],
+                "summary": "Загрузка трека",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Uploading file",
+                        "name": "track",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httputils.ResponseError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httputils.ResponseError"
+                        }
+                    }
+                }
             }
         }
     },

@@ -231,6 +231,32 @@ paths:
       summary: Информация о треках
       tags:
       - TrackController
+    post:
+      consumes:
+      - multipart/form-data
+      description: Загрузка трека на сервер
+      parameters:
+      - description: Uploading file
+        in: formData
+        name: track
+        required: true
+        type: file
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputils.ResponseError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputils.ResponseError'
+      security:
+      - ApiKeyAuth: []
+      summary: Загрузка трека
+      tags:
+      - TrackController
 securityDefinitions:
   ApiKeyAuth:
     in: header
