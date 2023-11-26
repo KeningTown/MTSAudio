@@ -235,6 +235,40 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/Tracks": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Создание новой комнаты и получение ее uuid",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "TrackController"
+                ],
+                "summary": "Информация о треках",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httputils.ResponseError"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {

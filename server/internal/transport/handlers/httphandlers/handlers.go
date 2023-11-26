@@ -21,12 +21,20 @@ type AuthUsecase interface {
 	RefreshTokens(refreshToken string) (string, string, error)
 }
 
-type HTTPHandler struct {
-	hu AuthUsecase
+type TrackUsecase interface {
+	GetTracksName() []string
 }
 
-func New(hu AuthUsecase) HTTPHandler {
-	return HTTPHandler{hu: hu}
+type HTTPHandler struct {
+	hu AuthUsecase
+	tu TrackUsecase
+}
+
+func New(hu AuthUsecase, tu TrackUsecase) HTTPHandler {
+	return HTTPHandler{
+		hu: hu,
+		tu: tu,
+	}
 }
 
 type ResponseUser struct {
@@ -233,4 +241,18 @@ func (hh HTTPHandler) CreateRoom(ctx *gin.Context) {
 	log.Printf("created new room: roomId = %s ownerId = %d", roomId, id)
 
 	ctx.JSON(http.StatusOK, response{RoomId: roomId})
+}
+
+// @Summary Информация о треках
+// @Tags TrackController
+// @Description Создание новой комнаты и получение ее uuid
+// @Produce  json
+// @Security ApiKeyAuth
+// @Success 200 {array} string
+// @Failure 401 {object} httputils.ResponseError
+// @Router /api/Tracks [get]
+func (hh HTTPHandler) GetTracks(ctx *gin.Context) {
+	tracks := hh.tu.GetTracksName()
+
+	ctx.JSON(200, tracks)
 }

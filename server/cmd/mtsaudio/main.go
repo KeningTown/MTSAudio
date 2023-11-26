@@ -9,8 +9,10 @@ import (
 	"mtsaudio/internal/transport"
 	"mtsaudio/internal/usecase/authusecase"
 	websocketusecase "mtsaudio/internal/usecase/roomusecase"
+	"mtsaudio/internal/usecase/trackusecase"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 )
 
@@ -43,11 +45,13 @@ func main() {
 	tokens.InitBlackList()
 
 	authUsecase := authusecase.New(db)
+	wsUsecase := websocketusecase.New(db)
+	dirPath, err := filepath.Abs("./static/")
+	trackUsecase := trackusecase.New(dirPath)
+
 	srv := transport.New(":80")
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT, os.Interrupt)
 	defer stop()
 
-	wsUsecase := websocketusecase.New(db)
-
-	srv.Run(ctx, authUsecase, wsUsecase)
+	srv.Run(ctx, authUsecase, wsUsecase, trackUsecase)
 }

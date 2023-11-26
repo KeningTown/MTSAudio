@@ -48,7 +48,7 @@ Root: `ws://localhost:80/ws/roomId/file`
 ```json
 {
     "owner_id": 1, //id владельца комнаты 
-    "file_name": "track.m3"
+    "file_name": "track.mp3"
 }
 ```
 Если будет указано id **не владельца** комнаты, то ничего не произойдет.

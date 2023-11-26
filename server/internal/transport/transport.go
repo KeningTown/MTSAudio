@@ -27,15 +27,15 @@ func New(addr string) Server {
 	}
 }
 
-func (s *Server) Run(ctx context.Context, huc httphandlers.AuthUsecase, wsUc websockethandlers.WebsocketUsecase) {
+func (s *Server) Run(ctx context.Context, hUc httphandlers.AuthUsecase, wsUc websockethandlers.WebsocketUsecase, tUc httphandlers.TrackUsecase) {
 	//swagger route
 	s.router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	//auth routes
-	httpHandler := httphandlers.New(huc)
+	httpHandler := httphandlers.New(hUc, tUc)
 	wsHandler := websockethandlers.New(wsUc)
 
-	//user auth routes
+	//auth routes
 	authRouts := s.router.Group("/", middleware.CheckAuthification())
 	s.router.POST("/api/Account/SignIn", httpHandler.UserSignIn)
 	s.router.POST("/api/Account/SignUp", httpHandler.UserSignUp)
@@ -43,9 +43,13 @@ func (s *Server) Run(ctx context.Context, huc httphandlers.AuthUsecase, wsUc web
 	s.router.GET("/api/Account/RefreshTokens", httpHandler.RefreshTokens)
 	authRouts.GET("/api/Account/Me", httpHandler.UserMyAccount)
 
-	//websocket handlers
+	//track route
+	authRouts.GET("/api/Tracks", httpHandler.GetTracks)
+
+	//room handler
 	authRouts.POST("/api/Room", httpHandler.CreateRoom)
 
+	//websocket handlers
 	s.router.GET("/ws/:roomId/chat", func(ctx *gin.Context) {
 		roomId := ctx.Param("roomId")
 
