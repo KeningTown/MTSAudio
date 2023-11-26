@@ -235,6 +235,43 @@ const docTemplate = `{
                     }
                 }
             }
+<<<<<<< HEAD
+=======
+        },
+        "/api/Tracks": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Создание новой комнаты и получение ее uuid",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "TrackController"
+                ],
+                "summary": "Информация о треках",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httputils.ResponseError"
+                        }
+                    }
+                }
+            }
+>>>>>>> 7b9fc1984b09754619ee44ea4dd07a95ad8762c2
         }
     },
     "definitions": {

@@ -210,6 +210,30 @@ paths:
       summary: Создание новой комнаты
       tags:
       - RoomController
+<<<<<<< HEAD
+=======
+  /api/Tracks:
+    get:
+      description: Создание новой комнаты и получение ее uuid
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputils.ResponseError'
+      security:
+      - ApiKeyAuth: []
+      summary: Информация о треках
+      tags:
+      - TrackController
+>>>>>>> 7b9fc1984b09754619ee44ea4dd07a95ad8762c2
 securityDefinitions:
   ApiKeyAuth:
     in: header
