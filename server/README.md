@@ -47,7 +47,6 @@ Root: `ws://localhost:80/ws/roomId/file`
 Владелец комнаты отсылает:
 ```json
 {
-    "owner_id": 1, //id владельца комнаты 
     "file_name": "track.mp3"
 }
 ```
@@ -56,7 +55,8 @@ Response:
 ```json
 {
     "audio_name": "звуки фонка.mp3",
-    "chunk": "*байты файла*"
+    "chunk": "*байты файла*",
+    "done":false //когда заканчивается загрузка, done = true
 }
 ```
 
