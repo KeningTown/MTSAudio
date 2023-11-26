@@ -9,26 +9,30 @@
     android:background="@color/gray">
 
     <LinearLayout
-        android:background="@drawable/chat_background"
         android:id="@+id/chat"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
-        android:padding="15dp"
+        android:background="@drawable/chat_background"
         android:clipToOutline="true"
+        android:orientation="vertical"
+        android:padding="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:orientation="vertical">
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="20dp">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewMessage"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
 
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginTop="18dp"
+            android:layout_weight="10"
             android:background="@drawable/text_input_layout"
             android:paddingHorizontal="17dp">
 
