@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">MTS Audio</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="invalid_username">Некоректная почта</string>
+    <string name="invalid_password">Некоректный пароль</string>
+    <string name="error_string">Ошибка авторизации</string>
+    <string name="welcome">Добро пожаловать</string>
+    <string name="login">Войти</string>
+    <string name="signup">Зарегистрироваться</string>
+    <string name="enter">Вход</string>
+    <string name="next">Далее</string>
+    <string name="user_name">Имя пользователя</string>
+    <string name="user_password">Пароль</string>
+    <string name="not_have_account">Еще нет аккаунта? </string>
+    <string name="you_enter">Вы входите в сервис МТС Music</string>
+    <string name="have_account">Уже есть аккаунт?</string>
+    <string name="registr">Регистрация</string>
+    <string name="error_get_lobby">Ошибка подключения к комнате</string>
+    <string name="lobby_id">Номер комнаты</string>
+    <string name="enter_lobby">Войти в комнату</string>
+    <string name="create_lobby">Создать комнату</string>
+    <string name="lobbyId">lobbyId</string>
+    <string name="send_message">Отправить сообщение</string>
+    <string name="sample_message">message sample</string>
+    <string name="write_message">Написать сообщение</string>
+    <string name="chat">Чат</string>
+    <string name="Subscribers">Участники</string>
+    <string name="link">Ссылка приглашение</string>
+    <string name="upload">Загрузить</string>
+</resources>
