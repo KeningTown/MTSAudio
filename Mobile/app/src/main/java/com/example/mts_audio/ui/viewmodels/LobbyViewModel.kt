@@ -1,13 +1,11 @@
 package com.example.mts_audio.ui.viewmodels
 
-import android.media.MediaPlayer
+import android.util.Base64
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.mts_audio.data.model.Result
 import com.example.mts_audio.data.remote.lobby.LobbyResult
-import com.example.mts_audio.data.remote.websocket.ByteArrayDataSource
 import com.example.mts_audio.data.remote.websocket.WebSocketManager
 import com.example.mts_audio.data.repository.LobbyRepository
 import com.example.mts_audio.data.repository.LocalUserRepository
@@ -35,19 +33,19 @@ class LobbyViewModel @Inject constructor(
     private val _lobbyMessages = MutableLiveData<MessageItem>()
     val lobbyMessages: LiveData<MessageItem> = _lobbyMessages
 
+    private val _lobbyMusic = MutableLiveData<ByteArray>()
+    val lobbyMusic: LiveData<ByteArray> = _lobbyMusic
+
     private var chatSocket: WebSocket? = null
     private var musicSocket: WebSocket? = null
     private var fileSocket: WebSocket? = null
 
-    private lateinit var mediaPlayer: MediaPlayer
     private var music: ByteArray = byteArrayOf()
 
     private val userName = localUserRepository.getUserName()!!
 
 
     fun setRoom(roomId: String) {
-
-        mediaPlayer = MediaPlayer()
         chatSocket = webSocketManager.createChatWebSocket("ws://10.0.2.2:80/ws", "${roomId}/chat") {
             onChatMessage(it)
         }
@@ -59,7 +57,6 @@ class LobbyViewModel @Inject constructor(
         }
         fileSocket!!.send((accessTokenToJSON(localUserRepository.getAccessToken()!!)))
         fileSocket!!.send("{\"file_name\": \"видеообзор.mp3\"}")
-
     }
 
     private fun onChatMessage(message: String) {
@@ -68,14 +65,19 @@ class LobbyViewModel @Inject constructor(
         GlobalScope.launch(Dispatchers.Main) {
             _lobbyMessages.value = MessageItem(Message(outPut.username, outPut.msg), isClient)
         }
-        playAudio(music)
         Log.d("msg", "${outPut!!.toJsonString()}")
     }
 
     private fun onFileMessage(message: String) {
         val outPut = parseJsonFile(message)
-        music.plus(outPut.chunk)
-        Log.d("msg", "${outPut!!.toJsonString()}")
+        music += Base64.decode(outPut.chunk, Base64.DEFAULT)
+        Log.d("music", "${Base64.decode(outPut.chunk, Base64.DEFAULT).size}")
+        if(outPut.done){
+            GlobalScope.launch(Dispatchers.Main) {
+                Log.d("music", music.size.toString())
+                _lobbyMusic.value = music
+            }
+        }
     }
 
     private fun accessTokenToJSON(accessToken: String): String {
@@ -87,7 +89,7 @@ class LobbyViewModel @Inject constructor(
             val gson = Gson()
             gson.fromJson(jsonString, File::class.java)
         } catch (e: Exception) {
-            File("", ByteArray(0))
+            File("", "",false)
         }
     }
 
@@ -108,16 +110,5 @@ class LobbyViewModel @Inject constructor(
         chatSocket?.close(1000, "Close")
     }
 
-    private fun playAudio(audioData: ByteArray) {
-        try {
-            mediaPlayer.stop();
-            mediaPlayer.reset();
 
-            mediaPlayer.setDataSource(ByteArrayDataSource(audioData));
-            mediaPlayer.prepare();
-            mediaPlayer.start();
-        } catch (e: Exception) {
-            Log.e("TAG", "Error playing audio $e");
-        }
-    }
 }
